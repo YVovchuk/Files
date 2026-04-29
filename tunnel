@@ -1,4 +1,4 @@
-<html><head><meta name="color-scheme" content="light dark"></head><body><pre style="word-wrap: break-word; white-space: pre-wrap;">#!/usr/bin/env bash
+#!/usr/bin/env bash
 set -euo pipefail
 
 #################################
@@ -17,7 +17,7 @@ die() { echo -e "\033[1;31m[ERROR]\033[0m $1"; exit 1; }
 
 # Check OS and set release variable
 . /etc/os-release
-if [[ "$ID" != "ubuntu" &amp;&amp; "$ID" != "debian" ]]; then
+if [[ "$ID" != "ubuntu" && "$ID" != "debian" ]]; then
     die "Этот скрипт поддерживает только Ubuntu или Debian: $ID"
 fi
 
@@ -46,21 +46,21 @@ ORIGIN_IP=${ORIGIN_IP:-false}
 #################################
 LOCAL_IP=$(hostname -I | awk '{print $1}')
 
-if ! command -v ufw &gt;/dev/null 2&gt;&amp;1; then
+if ! command -v ufw >/dev/null 2>&1; then
     echo "UFW не установлен. Устанавливаю..."
-    apt update -qq &amp;&amp; apt install -y ufw
+    apt update -qq && apt install -y ufw
 fi
 
-if LC_ALL=C ufw status 2&gt;/dev/null | grep -q "Status: active"; then
+if LC_ALL=C ufw status 2>/dev/null | grep -q "Status: active"; then
     echo "UFW уже активен."
 else
     echo "ВНИМАНИЕ: UFW выключен или не настроен. Включаю..."
     
-    ufw allow OpenSSH &gt;/dev/null 2&gt;&amp;1 || true
+    ufw allow OpenSSH >/dev/null 2>&1 || true
     
-    ufw --force enable &gt;/dev/null 2&gt;&amp;1
+    ufw --force enable >/dev/null 2>&1
     
-    if LC_ALL=C ufw status 2&gt;/dev/null | grep -q "Status: active"; then
+    if LC_ALL=C ufw status 2>/dev/null | grep -q "Status: active"; then
         echo "UFW успешно включён."
     else
         echo "ОШИБКА: Не удалось включить UFW. Проверьте вручную!"
@@ -69,7 +69,7 @@ else
 fi
 
 echo "--- Оптимизация сетевого стека ядра ---"
-cat &lt;&lt;EOF &gt; /etc/sysctl.d/99-relay-optimization.conf
+cat <<EOF > /etc/sysctl.d/99-relay-optimization.conf
 net.ipv4.ip_forward = 1
 net.core.default_qdisc = fq
 net.ipv4.tcp_congestion_control = bbr
@@ -90,7 +90,7 @@ sysctl --system
 echo "--- Настройка правил перенаправления (before.rules) ---"
 cp /etc/ufw/before.rules /etc/ufw/before.rules.bak
 
-cat &lt;&lt;EOF &gt; /tmp/ufw_nat_rules
+cat <<EOF > /tmp/ufw_nat_rules
 *nat
 :PREROUTING ACCEPT [0:0]
 :POSTROUTING ACCEPT [0:0]
@@ -126,7 +126,7 @@ EOF
 sed -i '/\*nat/,/COMMIT/d' /etc/ufw/before.rules
 sed -i '/\*mangle/,/COMMIT/d' /etc/ufw/before.rules
 
-cat /tmp/ufw_nat_rules /etc/ufw/before.rules &gt; /etc/ufw/before.rules.new
+cat /tmp/ufw_nat_rules /etc/ufw/before.rules > /etc/ufw/before.rules.new
 mv /etc/ufw/before.rules.new /etc/ufw/before.rules
 
 echo "--- Открытие портов в самом фаерволе ---"
@@ -144,4 +144,4 @@ echo "Готово! Система оптимизирована, порты от
 # RESULT
 #################################
 echo
-log "Готово"</pre></body></html>
+log "Готово"
