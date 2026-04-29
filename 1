@@ -132,10 +132,6 @@ mv /etc/ufw/before.rules.new /etc/ufw/before.rules
 echo "--- Открытие портов в самом фаерволе ---"
 ufw allow 443/tcp
 ufw allow 443/udp
-ufw allow 8443/tcp
-ufw allow 8443/udp
-ufw allow 10000:60000/tcp
-ufw allow 10000:60000/udp
 
 sed -i 's/DEFAULT_FORWARD_POLICY="DROP"/DEFAULT_FORWARD_POLICY="ACCEPT"/' /etc/default/ufw
 
